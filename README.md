@@ -47,6 +47,32 @@ Testing confirmed the scheme worked as designed:
 
 Python, Flask, `hmac` and `hashlib` (Python standard library), curl, Postman
 
+## Running This Demo
+
+```bash
+pip install -r requirements.txt
+
+# Terminal 1 — start the server
+python server.py
+
+# Terminal 2 — run the client (sends a legitimate, a tampered, and a replayed request)
+python client.py
+```
+
+Expected output:
+```
+1) Legitimate signed request:
+   Status: 200 | Body: {'status': 'accepted', ...}
+
+2) Tampered request (payload changed after signing):
+   Status: 401 | Body: {'error': 'Invalid signature'}
+
+3) Replayed request (reusing the same nonce as request #1):
+   Status: 401 | Body: {'error': 'Replay detected: nonce already used'}
+```
+
+`server.py` implements the HMAC-SHA256 verification logic (signature check, timestamp window, nonce replay protection). `client.py` demonstrates signing a legitimate request, then deliberately tampering with and replaying requests to show the server correctly rejects both.
+
 ## Key Takeaway
 
 This project reflects a security engineering approach: identify the threat model, prove the vulnerability practically (not just theoretically), design a proportionate cryptographic control, and validate it experimentally.
